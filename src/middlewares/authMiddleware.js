@@ -8,7 +8,7 @@ exports.auth = async (req, res, next) => {
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.findById(payload.userId).select('rol');
+    const user = await User.findById(payload.id).select('rol');
 
     if (!user) {
       return res.status(401).json({ msg: 'Token válido pero usuario no encontrado' });
