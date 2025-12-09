@@ -1,0 +1,272 @@
+openapi: 3.0.3
+info:
+  title: API de Editor de Notas
+  description: API RESTful para autenticación de usuarios y manejo de notas personales.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor local de desarrollo
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        nombre:
+          type: string
+        correo:
+          type: string
+        rol:
+          type: string
+          enum: [user, admin]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    UserRegister:
+      type: object
+      required: [nombre, correo, contrasena]
+      properties:
+        nombre:
+          type: string
+        correo:
+          type: string
+        contrasena:
+          type: string
+
+    UserLogin:
+      type: object
+      required: [correo, contrasena]
+      properties:
+        correo:
+          type: string
+        contrasena:
+          type: string
+
+    Nota:
+      type: object
+      properties:
+        _id:
+          type: string
+        titulo:
+          type: string
+        contenido:
+          type: string
+        usuario:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    NotaCreate:
+      type: object
+      required: [titulo, contenido]
+      properties:
+        titulo:
+          type: string
+        contenido:
+          type: string
+
+    NotaUpdate:
+      type: object
+      properties:
+        titulo:
+          type: string
+        contenido:
+          type: string
+
+paths:
+
+  #############################
+  #        AUTENTICACIÓN
+  #############################
+
+  /auth/register:
+    post:
+      summary: Registrar nuevo usuario
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+      responses:
+        '201':
+          description: Usuario creado
+        '400':
+          description: Datos inválidos o correo repetido
+        '500':
+          description: Error del servidor
+
+  /auth/login:
+    post:
+      summary: Iniciar sesión
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: Login exitoso
+        '401':
+          description: Credenciales incorrectas
+        '500':
+          description: Error del servidor
+
+  #############################
+  #        USUARIOS (ADMIN)
+  #############################
+
+  /usuarios:
+    get:
+      summary: Obtener lista de usuarios (solo admin)
+      tags: [Usuarios]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuarios
+        '401':
+          description: Token inválido
+        '403':
+          description: No autorizado
+        '500':
+          description: Error del servidor
+
+  /usuarios/{id}:
+    delete:
+      summary: Eliminar usuario (solo admin)
+      tags: [Usuarios]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuario eliminado
+        '404':
+          description: Usuario no encontrado
+        '500':
+          description: Error del servidor
+
+  #############################
+  #            NOTAS
+  #############################
+
+  /notas:
+    get:
+      summary: Listar notas del usuario autenticado
+      tags: [Notas]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de notas del usuario
+        '401':
+          description: Token inválido
+        '500':
+          description: Error interno
+
+    post:
+      summary: Crear una nueva nota
+      tags: [Notas]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotaCreate'
+      responses:
+        '201':
+          description: Nota creada
+        '400':
+          description: Datos faltantes
+        '401':
+          description: Token inválido
+        '500':
+          description: Error del servidor
+
+  /notas/{id}:
+    get:
+      summary: Obtener una nota por ID
+      tags: [Notas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Nota encontrada
+        '404':
+          description: Nota no existe
+        '500':
+          description: Error del servidor
+
+    put:
+      summary: Actualizar una nota
+      tags: [Notas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotaUpdate'
+      responses:
+        '200':
+          description: Nota actualizada
+        '404':
+          description: Nota no encontrada
+        '500':
+          description: Error interno
+
+    delete:
+      summary: Eliminar una nota
+      tags: [Notas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Nota eliminada
+        '404':
+          description: Nota no encontrada
+        '500':
+          description: Error interno
