@@ -1,4 +1,4 @@
-const API = "https://editortext.onrender.com/api";
+const API = "/api";
 
 document.addEventListener('DOMContentLoaded', () => {
   const token = localStorage.getItem('token');
