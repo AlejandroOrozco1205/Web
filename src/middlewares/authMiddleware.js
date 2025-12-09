@@ -14,7 +14,7 @@ exports.auth = async (req, res, next) => {
       return res.status(401).json({ msg: 'Token válido pero usuario no encontrado' });
     }
 
-    req.user = { id: payload.id, rol: user.rol };
+    req.user = { id: payload.id, rol: payload.rol };
 
     next();
   } catch (err) {
