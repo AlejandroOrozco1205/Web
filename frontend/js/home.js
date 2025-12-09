@@ -1,4 +1,4 @@
-const API = "https://editortext.onrender.com/api";
+const API = "/api";
 
 // Registra nuevo usuario (modal register)
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
