@@ -1,4 +1,4 @@
-const API = "https://editortext.onrender.com/api";
+const API = "/api";
 
 let currentPage = 1;          // página actual
 let totalPages = 1;           // total de páginas desde backend
